@@ -14,7 +14,7 @@ export const PeoplePage = () => {
   const [searchParams] = useSearchParams();
   const [error, setError] = useState(false);
   const peopleList = [...people];
-  let fillterdList = [...peopleList];
+  let filteredList = [...peopleList];
 
   useEffect(() => {
     getPeople()
@@ -29,7 +29,7 @@ export const PeoplePage = () => {
       ?.toLocaleLowerCase();
 
     if (query) {
-      fillterdList = fillterdList.filter(
+      filteredList = filteredList.filter(
         person =>
           person.name.toLocaleLowerCase().includes(query) ||
           person.fatherName?.toLocaleLowerCase().includes(query) ||
@@ -40,31 +40,41 @@ export const PeoplePage = () => {
 
   switch (searchParams.get('sex')) {
     case 'm':
-      fillterdList = fillterdList.filter(person => person.sex === 'm');
+      filteredList = filteredList.filter(person => person.sex === 'm');
       break;
     case 'f':
-      fillterdList = fillterdList.filter(person => person.sex === 'f');
+      filteredList = filteredList.filter(person => person.sex === 'f');
       break;
+  }
+
+  if (searchParams.getAll('centuries').length > 0) {
+    let cents = searchParams.getAll('centuries');
+
+    cents = cents.map(cent => `${+cent - 1}`);
+
+    filteredList = filteredList.filter(per =>
+      cents.includes(per.born.toString().slice(0, 2)),
+    );
   }
 
   switch (searchParams.get('sort')) {
     case 'name':
-      fillterdList.sort((a, b) => a.name.localeCompare(b.name));
+      filteredList.sort((a, b) => a.name.localeCompare(b.name));
       break;
     case 'sex':
-      fillterdList.sort((a, b) => a.sex.localeCompare(b.sex));
+      filteredList.sort((a, b) => a.sex.localeCompare(b.sex));
       break;
     case 'born':
-      fillterdList.sort((a, b) => a.born - b.born);
+      filteredList.sort((a, b) => a.born - b.born);
       break;
 
     case 'died':
-      fillterdList.sort((a, b) => a.died - b.died);
+      filteredList.sort((a, b) => a.died - b.died);
       break;
   }
 
   if (searchParams.get('order') === 'desc') {
-    fillterdList.reverse();
+    filteredList.reverse();
   }
 
   return (
@@ -90,8 +100,8 @@ export const PeoplePage = () => {
                 <p data-cy="noPeopleMessage">
                   There are no people on the server
                 </p>
-              ) : fillterdList.length > 0 ? (
-                <PeopleTable people={fillterdList} slug={slug} />
+              ) : filteredList.length > 0 ? (
+                <PeopleTable people={filteredList} slug={slug} />
               ) : (
                 <p>There are no people matching the current search criteria</p>
               )}

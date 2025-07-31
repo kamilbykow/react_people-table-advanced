@@ -15,15 +15,25 @@ export const PeopleFilters = () => {
     'is-active': searchParams.get('sex') === 'f',
   });
 
-  const getCenturiesLink = (cent: string) => {
-    if (!searchParams.getAll('centuries').includes(cent)) {
-      searchParams.append('centuries', cent);
+  const handleInput = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const newSP = new URLSearchParams(searchParams.toString());
 
-      setSearchParams(searchParams);
-    } else {
-      searchParams.delete('centuries', cent);
-      setSearchParams(searchParams);
+    setQuery(event.target.value);
+    newSP.set('query', event.target.value);
+    setSearchParams(newSP.toString());
+
+    if (event.target.value.length === 0) {
+      newSP.delete('query');
+      setSearchParams(newSP.toString());
     }
+  };
+
+  const getCenturiesLink = (cent: string) => {
+    return {
+      centuries: searchParams.getAll('centuries').includes(cent)
+        ? [...searchParams.getAll('centuries').filter(item => item !== cent)]
+        : [...searchParams.getAll('centuries'), cent],
+    };
   };
 
   return (
@@ -53,16 +63,7 @@ export const PeopleFilters = () => {
             className="input"
             placeholder="Search"
             value={query}
-            onChange={e => {
-              setQuery(e.target.value);
-              searchParams.set('query', e.target.value);
-              setSearchParams(searchParams);
-
-              if (e.target.value.length === 0) {
-                searchParams.delete('query');
-                setSearchParams(searchParams);
-              }
-            }}
+            onChange={e => handleInput(e)}
           />
 
           <span className="icon is-left">
@@ -74,45 +75,45 @@ export const PeopleFilters = () => {
       <div className="panel-block">
         <div className="level is-flex-grow-1 is-mobile" data-cy="CenturyFilter">
           <div className="level-left">
-            <button
+            <SearchLink
               data-cy="century"
               className={`button mr-1 ${searchParams.getAll('centuries').includes('16') && 'is-info'}`}
-              onClick={() => getCenturiesLink('16')}
+              params={getCenturiesLink('16')}
             >
               16
-            </button>
+            </SearchLink>
 
-            <button
+            <SearchLink
+              params={getCenturiesLink('17')}
               data-cy="century"
               className={`button mr-1 ${searchParams.getAll('centuries').includes('17') && 'is-info'}`}
-              onClick={() => getCenturiesLink('17')}
             >
               17
-            </button>
+            </SearchLink>
 
-            <button
+            <SearchLink
               data-cy="century"
               className={`button mr-1 ${searchParams.getAll('centuries').includes('18') && 'is-info'}`}
-              onClick={() => getCenturiesLink('18')}
+              params={getCenturiesLink('18')}
             >
               18
-            </button>
+            </SearchLink>
 
-            <button
+            <SearchLink
               data-cy="century"
               className={`button mr-1 ${searchParams.getAll('centuries').includes('19') && 'is-info'}`}
-              onClick={() => getCenturiesLink('19')}
+              params={getCenturiesLink('19')}
             >
               19
-            </button>
+            </SearchLink>
 
-            <button
+            <SearchLink
               data-cy="century"
               className={`button mr-1 ${searchParams.getAll('centuries').includes('20') && 'is-info'}`}
-              onClick={() => getCenturiesLink('20')}
+              params={getCenturiesLink('20')}
             >
               20
-            </button>
+            </SearchLink>
           </div>
 
           <div className="level-right ml-4">
@@ -131,20 +132,15 @@ export const PeopleFilters = () => {
       </div>
 
       <div className="panel-block">
-        <button
+        <SearchLink
           className="button is-link is-outlined is-fullwidth"
+          params={{ sex: null, query: null, centuries: null }}
           onClick={() => {
             setQuery('');
-
-            searchParams.delete('sex');
-            searchParams.delete('query');
-            searchParams.delete('centuries');
-
-            setSearchParams(searchParams);
           }}
         >
           Reset all filters
-        </button>
+        </SearchLink>
       </div>
     </nav>
   );
