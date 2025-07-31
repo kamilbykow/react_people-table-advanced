@@ -4,6 +4,7 @@ import { Navbar } from './components/Navbar';
 import './App.scss';
 import { HomePage } from './components/HomePage';
 import { Navigate, Route, Routes } from 'react-router-dom';
+import { PeopleOutlet } from './components/PeopleOutlet';
 
 export const App = () => {
   return (
@@ -16,7 +17,7 @@ export const App = () => {
             <Route path="/" element={<HomePage />} />
             <Route path="/home" element={<Navigate to="/" replace />} />
 
-            <Route path="people" element={<PeoplePage />}>
+            <Route path="people" element={<PeopleOutlet />}>
               <Route index element={<PeoplePage />} />
               <Route path=":slug" element={<PeoplePage />} />
             </Route>
